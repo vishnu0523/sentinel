@@ -175,3 +175,31 @@ test("submission readiness cannot claim verification without its evidence chain"
   assert.equal(submissionReadiness(complete).verifiedCount, 1);
   assert.equal(submissionReadiness(complete).score, 75);
 });
+
+test("saved workspaces migrate the stale dependency advisory claim", () => {
+  const state = initialWorkspace();
+  const stale = {
+    ...state,
+    findings: state.findings.map((finding) =>
+      finding.id === "FND-05"
+        ? {
+            ...finding,
+            title: "Dependency advisories require reachability triage",
+            description: "A stale time-bound audit claim.",
+          }
+        : finding,
+    ),
+  };
+  const migrated = parseWorkspace(stale);
+  const dependency = migrated.findings.find(
+    (finding) => finding.id === "FND-05",
+  );
+  assert.equal(
+    dependency?.title,
+    "Dependency posture requires continuous verification",
+  );
+  assert.match(
+    dependency?.description || "",
+    /zero known production advisories/,
+  );
+});

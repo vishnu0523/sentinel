@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Workspace } from "./workspace";
+import { findings as seededFindings } from "./seed/architecture";
 
 const text = z.string().max(20000);
 const id = z.string().min(1).max(150);
@@ -137,9 +138,37 @@ export function parseWorkspace(input: unknown): Workspace {
         );
     }
   // Preserve captured run property order because the digest covers its original JSON bytes.
+  // This narrow migration corrects a stale, time-bound dependency claim in
+  // browser workspaces created before the clean 2026-09-27 audit.
+  const currentDependencyCandidate = seededFindings.find(
+    (finding) => finding.id === "FND-05",
+  );
+  const findings = value.findings.map((finding) => {
+    if (
+      finding.id !== "FND-05" ||
+      finding.title !== "Dependency advisories require reachability triage" ||
+      !currentDependencyCandidate
+    )
+      return finding;
+    return {
+      ...finding,
+      title: currentDependencyCandidate.title,
+      summary: currentDependencyCandidate.summary,
+      description: currentDependencyCandidate.description,
+      status: "open" as const,
+      verification: "unverified" as const,
+      likelihood: currentDependencyCandidate.likelihood,
+      impact: currentDependencyCandidate.impact,
+      safePoc: currentDependencyCandidate.safePoc,
+      businessImpact: currentDependencyCandidate.businessImpact,
+      remediation: currentDependencyCandidate.remediation,
+      retest: currentDependencyCandidate.retest,
+      updatedAt: new Date().toISOString(),
+    };
+  });
   return {
     version: 2,
-    findings: value.findings,
+    findings,
     runs: value.runs,
     source: value.source,
     tasks: value.tasks,
