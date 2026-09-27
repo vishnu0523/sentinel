@@ -1,0 +1,146 @@
+// World Monitor Security Assurance Suite — persistence schema.
+// SQLite for local prototyping. To move to PostgreSQL, change the provider to
+// "postgresql" and point DATABASE_URL at your instance; no model changes needed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Assessment {
+  id               String            @id
+  name             String
+  target           String
+  sourceRepo       String
+  status           String
+  startDate        String
+  endDate          String
+  leadAssessor     String
+  authorizationRef String
+  scopeItems       ScopeItem[]
+  components       Component[]
+  findings         Finding[]
+  evidence         EvidenceItem[]
+  checks           TestCheck[]
+  results          TestResult[]
+  tasks            RemediationTask[]
+  reportSections   ReportSection[]
+}
+
+model ScopeItem {
+  id           String     @id
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  asset        String
+  kind         String
+  inScope      Boolean
+  notes        String
+}
+
+model Component {
+  id              String     @id
+  assessmentId    String
+  assessment      Assessment @relation(fields: [assessmentId], references: [id])
+  name            String
+  kind            String
+  zone            String
+  description     String
+  exposure        String
+}
+
+model TrustBoundary {
+  id          String @id
+  name        String
+  description String
+}
+
+model TestCheck {
+  id           String       @id
+  assessmentId String
+  assessment   Assessment   @relation(fields: [assessmentId], references: [id])
+  category     String
+  title        String
+  mode         String // fixture | passive-network | active-local
+  componentId  String
+  asvsRef      String
+  results      TestResult[]
+}
+
+model TestResult {
+  id           String     @id
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  checkId      String
+  check        TestCheck  @relation(fields: [checkId], references: [id])
+  status       String // passed | failed | warning | not-run | blocked
+  summary      String
+  logJson      String
+  executedAt   String
+}
+
+model CvssVector {
+  id        String  @id
+  findingId String  @unique
+  finding   Finding @relation(fields: [findingId], references: [id])
+  vector    String
+  baseScore Float
+}
+
+model Finding {
+  id            String      @id
+  assessmentId  String
+  assessment    Assessment  @relation(fields: [assessmentId], references: [id])
+  title         String
+  description   String
+  componentId   String
+  owasp         String
+  severity      String
+  status        String
+  verification  String
+  cvss          CvssVector?
+  detailJson    String // steps, PoC, impact, remediation, retest
+  evidenceIds   String
+  createdAt     String
+}
+
+model EvidenceItem {
+  id             String     @id
+  assessmentId   String
+  assessment     Assessment @relation(fields: [assessmentId], references: [id])
+  title          String
+  kind           String // observation | inference | assumption
+  source         String
+  accessedAt     String
+  observation    String
+  confidence     Int
+  limitation     String
+  classification String
+  verification   String
+}
+
+model RemediationTask {
+  id           String     @id
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  title        String
+  phase        String
+  findingIds   String
+  owner        String
+  effort       String
+  status       String
+  detail       String
+}
+
+model ReportSection {
+  id           String     @id
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  key          String
+  title        String
+  included     Boolean
+  order        Int
+}

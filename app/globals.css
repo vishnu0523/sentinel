@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Solid palette only. No gradients anywhere in this product. */
+@layer base {
+  :root {
+    --background: 60 9% 97%;
+    --foreground: 210 12% 11%;
+    --surface: 0 0% 100%;
+    --subtle: 60 7% 95%;
+    --border: 60 5% 88%;
+    --input: 60 5% 84%;
+    --ring: 175 70% 27%;
+    --muted: 60 6% 93%;
+    --muted-foreground: 210 6% 42%;
+
+    --primary: 175 70% 25%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 170 32% 93%;
+
+    --sev-critical: 345 70% 32%;
+    --sev-high: 16 78% 44%;
+    --sev-medium: 34 88% 38%;
+    --sev-low: 95 34% 34%;
+    --sev-info: 215 16% 42%;
+
+    --ok: 150 48% 30%;
+    --warn: 34 88% 38%;
+    --bad: 358 64% 42%;
+  }
+
+  .dark {
+    --background: 210 10% 8%;
+    --foreground: 60 8% 92%;
+    --surface: 210 9% 11%;
+    --subtle: 210 8% 14%;
+    --border: 210 7% 20%;
+    --input: 210 7% 26%;
+    --ring: 172 45% 48%;
+    --muted: 210 8% 16%;
+    --muted-foreground: 210 6% 62%;
+
+    --primary: 172 48% 42%;
+    --primary-foreground: 210 10% 8%;
+    --primary-soft: 175 30% 16%;
+
+    --sev-critical: 350 62% 56%;
+    --sev-high: 16 76% 56%;
+    --sev-medium: 38 82% 52%;
+    --sev-low: 95 30% 52%;
+    --sev-info: 215 14% 62%;
+
+    --ok: 150 40% 48%;
+    --warn: 38 82% 52%;
+    --bad: 358 62% 58%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-[13.5px] leading-[1.5];
+    font-feature-settings: "cv11", "ss01", "tnum";
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-lg border bg-surface shadow-panel;
+  }
+  .eyebrow {
+    @apply text-2xs font-medium uppercase tracking-[0.08em] text-muted-foreground;
+  }
+  .kbd {
+    @apply inline-flex h-5 min-w-5 items-center justify-center rounded border bg-subtle px-1 font-mono text-[10.5px] text-muted-foreground;
+  }
+  .prose-audit p {
+    @apply mb-2 last:mb-0;
+  }
+}
+
+/* Thin, quiet scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
