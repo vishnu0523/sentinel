@@ -24,7 +24,7 @@ For a reproducible installation, use `npm ci` when `package-lock.json` is presen
 
 ## Repository review
 
-Set `WORLDMONITOR_SOURCE` in `.env` to the absolute path of your authorized local World Monitor checkout, then restart the server. On this workstation, the default is `~/OneDrive/Documents/ChatGPT/Earn/worldmonitor`.
+The Source review screen works out of the box with a committed demo fixture so every reviewer can run the flow. For target-specific evidence, set `WORLDMONITOR_SOURCE` in `.env` to the absolute path of your authorized local World Monitor checkout, then restart the server. If that configured path is unavailable, the app falls back to the demo fixture and labels the inventory as demo source.
 
 The source review uses the TypeScript parser to inventory HTML assignment/call sinks, dynamic fetch calls and selected authentication controls. It covers `api`, `src`, `server`, and `convex`, excludes symlinks and generated directories, and limits files and signals. Each signal records a file, line and SHA-256 of the reviewed bytes. API file counts are not endpoint coverage. AST signals are candidates, not vulnerability verdicts.
 

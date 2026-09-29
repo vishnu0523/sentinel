@@ -35,7 +35,7 @@ const finding = z.object({
     "accepted",
     "false-positive",
   ]),
-  verification: z.enum(["unverified", "verified"]),
+  verification: z.enum(["demo", "unverified", "verified"]),
   likelihood: z.number().int().min(1).max(5),
   impact: z.number().int().min(1).max(5),
   evidenceIds: strings,
@@ -81,6 +81,8 @@ const run = z.object({
 const source = z.object({
   id,
   createdAt: time,
+  sourceMode: z.enum(["configured", "demo"]).default("configured"),
+  sourceLabel: text.default("Configured source checkout"),
   commit: text,
   dirty: z.boolean(),
   files: z.number().int().nonnegative(),
@@ -121,7 +123,7 @@ export function parseWorkspace(input: unknown): Workspace {
     throw new Error(
       `Invalid assessment packet: ${checked.error.issues[0].path.join(".") || "workspace"}.`,
     );
-  const value = input as Workspace;
+  const value = checked.data as Workspace;
   if (
     new Set(value.findings.map((f) => f.id)).size !== value.findings.length ||
     new Set(value.runs.map((r) => r.id)).size !== value.runs.length

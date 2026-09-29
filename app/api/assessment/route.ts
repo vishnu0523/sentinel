@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomUUID } from "node:crypto";
-import { homedir } from "node:os";
 import path from "node:path";
 import { executeLab } from "@/lib/lab";
 import { reviewSource } from "@/lib/source-review";
@@ -41,17 +40,35 @@ export async function POST(request: NextRequest) {
       );
     scanning = true;
     try {
-      const root =
-        process.env.WORLDMONITOR_SOURCE ||
-        path.join(
-          homedir(),
-          "OneDrive",
-          "Documents",
-          "ChatGPT",
-          "Earn",
-          "worldmonitor",
-        );
-      return NextResponse.json(await reviewSource(root), {
+      const configuredRoot = process.env.WORLDMONITOR_SOURCE?.trim();
+      const demoRoot = path.join(
+        process.cwd(),
+        "tests",
+        "fixtures",
+        "target-source",
+      );
+      const review = configuredRoot
+        ? await reviewSource(configuredRoot, {
+            sourceMode: "configured",
+            sourceLabel: "Configured World Monitor checkout",
+          }).catch((error) => {
+            if (
+              error instanceof Error &&
+              error.message.startsWith("Source checkout unavailable")
+            ) {
+              return reviewSource(demoRoot, {
+                sourceMode: "demo",
+                sourceLabel:
+                  "Demo source fixture; configured checkout was unavailable",
+              });
+            }
+            throw error;
+          })
+        : await reviewSource(demoRoot, {
+            sourceMode: "demo",
+            sourceLabel: "Demo source fixture",
+          });
+      return NextResponse.json(review, {
         headers: { "Cache-Control": "no-store" },
       });
     } catch (error) {

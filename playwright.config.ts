@@ -20,10 +20,5 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
-    env: {
-      WORLDMONITOR_SOURCE:
-        process.env.WORLDMONITOR_SOURCE ||
-        `${process.cwd()}/tests/fixtures/target-source`,
-    },
   },
 });

@@ -15,6 +15,8 @@ export interface SourceSignal {
 export interface SourceReview {
   id: string;
   createdAt: string;
+  sourceMode: "configured" | "demo";
+  sourceLabel: string;
   commit: string;
   dirty: boolean;
   files: number;
@@ -24,7 +26,13 @@ export interface SourceReview {
   truncated: boolean;
   limitation: string;
 }
-export async function reviewSource(root: string): Promise<SourceReview> {
+export async function reviewSource(
+  root: string,
+  options: {
+    sourceMode?: SourceReview["sourceMode"];
+    sourceLabel?: string;
+  } = {},
+): Promise<SourceReview> {
   const signals: SourceSignal[] = [];
   let files = 0,
     routes = 0,
@@ -168,6 +176,8 @@ export async function reviewSource(root: string): Promise<SourceReview> {
   return {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
+    sourceMode: options.sourceMode || "configured",
+    sourceLabel: options.sourceLabel || "Configured source checkout",
     commit,
     dirty,
     files,
@@ -175,7 +185,6 @@ export async function reviewSource(root: string): Promise<SourceReview> {
     signals,
     digest: createHash("sha256").update(manifest.join("\n")).digest("hex"),
     truncated,
-    limitation:
-      "AST inventory of api, src, server and convex only. API file count is not endpoint coverage. Signals are review candidates, not confirmed vulnerabilities. File hashes capture reviewed bytes; Git metadata alone does not cover untracked files.",
+    limitation: `${options.sourceMode === "demo" ? "Demo fixture source is for workflow demonstration only; it is not World Monitor target evidence. " : ""}AST inventory of api, src, server and convex only. API file count is not endpoint coverage. Signals are review candidates, not confirmed vulnerabilities. File hashes capture reviewed bytes; Git metadata alone does not cover untracked files.`,
   };
 }

@@ -160,6 +160,8 @@ test("submission readiness cannot claim verification without its evidence chain"
     source: {
       id: "source-1",
       createdAt: new Date().toISOString(),
+      sourceMode: "configured" as const,
+      sourceLabel: "Configured source checkout",
       commit: "a".repeat(40),
       dirty: false,
       files: 1,

@@ -232,9 +232,13 @@ export function SourcePanel({
       <div className="context-strip">
         <FolderGit2 size={18} />
         <div>
-          <strong>koala73 / worldmonitor</strong>
+          <strong>
+            {source?.sourceMode === "demo"
+              ? "Demo source fixture"
+              : "koala73 / worldmonitor"}
+          </strong>
           <span className="muted">
-            Local checkout / read-only AST inventory
+            {source?.sourceLabel || "Read-only AST inventory"}
           </span>
         </div>
         <Button primary disabled={busy} onClick={scan}>
@@ -251,7 +255,7 @@ export function SourcePanel({
           <Empty
             icon={FolderGit2}
             title="Start with the code"
-            text="Inspect the local World Monitor checkout for HTML sinks, dynamic fetch calls, and authentication controls. Every signal includes its file, line and content hash."
+            text="Inspect a configured World Monitor checkout, or use the built-in demo fixture when no local source path is available. Every signal includes its file, line and content hash."
             action={
               <Button primary disabled={busy} onClick={scan}>
                 <Code2 size={15} />
@@ -286,6 +290,11 @@ export function SourcePanel({
             />
           </div>
           <div className="source-provenance">
+            <Pill tone={source.sourceMode === "demo" ? "orange" : "green"}>
+              {source.sourceMode === "demo"
+                ? "Demo source"
+                : "Configured source"}
+            </Pill>
             <span className="mono">Commit {source.commit.slice(0, 12)}</span>
             <Pill tone={source.dirty ? "orange" : "green"}>
               {source.dirty ? "Working tree modified" : "Tracked tree clean"}
